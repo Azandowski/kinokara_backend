@@ -14,6 +14,12 @@ router.get('/users', roleMiddleware(["ADMIN"]), controller.getUsers)
 router.post('/editUser', roleMiddleware(["ADMIN"]), controller.editUser)
 router.delete('/user', roleMiddleware(["ADMIN"]), controller.deleteUser)
 router.get('/currentUser', authMiddleware, controller.getCurrentUser)
+router.post('/post', authMiddleware, controller.addPost)
+router.get('/checkposts', roleMiddleware(["ADMIN"]), controller.getPostsForAdmin)
+router.get('/posts', authMiddleware, controller.getPosts)
+router.post('/acceptpost', roleMiddleware(["ADMIN"]), controller.acceptPost)
+router.delete('/declinepost', roleMiddleware(["ADMIN"]), controller.declinePost)
+
 
 
 module.exports = router

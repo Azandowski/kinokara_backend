@@ -3,7 +3,8 @@ const Role = require('./models/Role')
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator')
-const {secret} = require("./config")
+const {secret} = require("./config");
+const Post = require('./models/Post');
 
 const generateAccessToken = (id) => {
     const payload = {
@@ -93,6 +94,47 @@ class authController {
     async getCurrentUser(req, res) {
         const user = await User.findById(req.user.id)
         res.json(user)      
+    }
+
+    async addPost(req, res) {
+        const {review, value } = req.body
+        const sendUser = await User.findById(req.user.id)
+        const post = new Post({ value, username: sendUser.username, userId: req.user.id, review, datePost: Date.now(), })
+        await post.save()
+        res.json(post)
+    }
+
+    async getPostsForAdmin(req, res) {
+        Post.find({ 'valid': false }, function (err, docs) {
+            console.log(docs)
+            res.json(docs)
+        });
+    }
+
+    async getPosts(req, res) {
+        Post.find({ 'valid': true }, function (err, docs) {
+            console.log(docs)
+            res.json(docs)
+        });
+    }
+
+    async acceptPost(req, res) {
+        const { postId } = req.body;
+        const newpost = await Post.findByIdAndUpdate(postId, { "valid": true })
+        console.log(newpost)
+        res.json(newpost)
+    }
+
+    async declinePost(req, res) {
+        const { postId } = req.body;
+        try {
+            console.log('delete post ' + postId);
+            await Post.findByIdAndRemove(postId)
+            res.json({'status': 'ok'})
+        } catch (e) {
+            res.js
+            res.status(400).json({message: 'Delete error'})
+        }
     }
 
 
